@@ -5,7 +5,7 @@ RSpec.describe FantasticstayApi do
     expect(FantasticstayApi::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "Client initialized" do
+    FantasticstayApi::Client.new("test_token")
   end
 end

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module FantasticstayApi
   class Client
     include FantasticstayApi::HttpStatusCodes
     include FantasticstayApi::ApiExceptions
 
-    API_ENDPOINT = 'https://api.fsapp.io'.freeze
+    API_ENDPOINT = "https://api.fsapp.io"
 
     attr_reader :api_token
 
@@ -11,7 +13,7 @@ module FantasticstayApi
       @api_token = api_token
     end
 
-    def listings()
+    def listings
       request(
         http_method: :get,
         endpoint: "listings"
@@ -20,12 +22,11 @@ module FantasticstayApi
 
     private
 
-
     def client
-      @_client ||= Faraday.new(API_ENDPOINT) do |client|
+      @client ||= Faraday.new(API_ENDPOINT) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
-        client.headers['x-api-key'] = @api_token
+        client.headers["x-api-key"] = @api_token
       end
     end
 
@@ -58,5 +59,5 @@ module FantasticstayApi
     def response_successful?(response)
       response.status == HTTP_OK_CODE
     end
-  end #Client
-end #FantasticstayApi
+  end
+end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FantasticstayApi
   module HttpStatusCodes
     HTTP_OK_CODE = 200

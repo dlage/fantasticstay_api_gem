@@ -8,3 +8,7 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+AllCops:
+  TargetRubyVersion: 2.4.0
+  NewCops: enable

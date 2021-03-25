@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A gem that implements functions from the FS API available for its users."
   spec.homepage      = "https://github.com/dlage/fantasticstay_api_gem"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
 
   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
@@ -31,9 +31,9 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
-  spec.add_dependency 'faraday', '~> 1.3.0'
-  spec.add_dependency 'oj', '~> 3.11'
-  #spec.add_dependency 'dry-configurable', '~> 0.12.1'
+  spec.add_dependency "faraday", "~> 1.3.0"
+  spec.add_dependency "oj", "~> 3.11"
+  # spec.add_dependency 'dry-configurable', '~> 0.12.1'
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html

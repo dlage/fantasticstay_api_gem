@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FantasticstayApi
   module ApiExceptions
     APIExceptionError = Class.new(StandardError)
