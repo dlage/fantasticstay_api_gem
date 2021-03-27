@@ -1,12 +1,20 @@
 # frozen_string_literal: true
 
 module FantasticstayApi
+  # Main client class that implements communication with the API
   class Client
     include FantasticstayApi::HttpStatusCodes
     include FantasticstayApi::ApiExceptions
 
     API_ENDPOINT = "https://api.fsapp.io"
-
+    HTTP_STATUS_MAPPING = {
+      HTTP_BAD_REQUEST_CODE => BadRequestError,
+      HTTP_UNAUTHORIZED_CODE => UnauthorizedError,
+      HTTP_FORBIDDEN_CODE => ForbiddenError,
+      HTTP_NOT_FOUND_CODE => NotFoundError,
+      HTTP_UNPROCESSABLE_ENTITY_CODE => UnprocessableEntityError,
+      "default" => ApiError
+    }.freeze
     attr_reader :api_token
 
     def initialize(api_token = nil)
@@ -40,19 +48,10 @@ module FantasticstayApi
     end
 
     def error_class(response)
-      case response.status
-      when HTTP_BAD_REQUEST_CODE
-        BadRequestError
-      when HTTP_UNAUTHORIZED_CODE
-        UnauthorizedError
-      when HTTP_FORBIDDEN_CODE
-        ForbiddenError
-      when HTTP_NOT_FOUND_CODE
-        NotFoundError
-      when HTTP_UNPROCESSABLE_ENTITY_CODE
-        UnprocessableEntityError
+      if HTTP_STATUS_MAPPING.include?(response.status)
+        HTTP_STATUS_MAPPING[response.status]
       else
-        ApiError
+        HTTP_STATUS_MAPPING["default"]
       end
     end
 
