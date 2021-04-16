@@ -13,3 +13,6 @@
 # project files
 /.idea/
 fantasticstay_api.iml
+
+# custom ignores
+.env
