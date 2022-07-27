@@ -46,8 +46,8 @@ module FantasticstayApi
       FantasticstayApi.configuration.property_names.each do |key|
         send("#{key}=", opts[key])
       end
-      @token = opts[:token] || ENV['FANTASTICSTAY_API_TOKEN']
-      @endpoint = opts[:endpoint] || ENV['FANTASTICSTAY_API_ENDPOINT']
+      @api_token = opts[:token] || ENV['FANTASTICSTAY_API_TOKEN']
+      @api_endpoint = opts[:endpoint] || ENV['FANTASTICSTAY_API_ENDPOINT'] || API_ENDPOINT
 
       yield_or_eval(&block) if block_given?
     end
@@ -66,11 +66,10 @@ module FantasticstayApi
     def client
       # provide your own logger
       logger = Logger.new $stderr
-      logger.level = Logger::ERROR
-      @client ||= Faraday.new(@endpoint) do |client|
+      logger.level = Logger::DEBUG
+      @client ||= Faraday.new(@api_endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
-        puts "Using #{@api_token}"
         client.headers['x-api-key'] = @api_token
         client.response :logger, logger
       end

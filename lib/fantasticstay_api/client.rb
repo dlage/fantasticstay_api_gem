@@ -11,12 +11,36 @@ module FantasticstayApi
         http_method: :get,
         endpoint: 'listings'
       )
-      listings = response['listings']
-      listings.each do |l|
-        l.transform_keys!(&:to_sym)
-      end
-      total = response['total']
-      { listings: listings, total: total }
+      process_response(response, 'listings')
+    end
+
+    # FantasticstayApi::Client.new.calendar(38859, '2022-01-01', '2022-07-31')
+    def calendar(listing_id, start_date = nil, end_date = nil, filters = {})
+      response = request(
+        http_method: :get,
+        endpoint: 'calendar',
+        params: {
+          listing_id: listing_id,
+          start_date: start_date,
+          end_date: end_date,
+          filters: filters
+        }
+      )
+      process_response(response, 'calendar')
+    end
+
+    # FantasticstayApi::Client.new.reservations(38859)
+    def reservations(listing_id, filters = {}, sort = {})
+      response = request(
+        http_method: :get,
+        endpoint: 'reservations',
+        params: {
+          listing_id: listing_id,
+          filters: filters,
+          sort: sort
+        }
+      )
+      process_response(response, 'reservations')
     end
 
     def integrations
@@ -24,12 +48,18 @@ module FantasticstayApi
         http_method: :get,
         endpoint: 'integrations'
       )
-      integrations = response['integrations']
-      integrations.each do |i|
-        i.transform_keys!(&:to_sym)
+      process_response(response, 'integrations')
+    end
+
+    protected
+
+    def process_response(response, model='results')
+      results = response[model]
+      results.each do |r|
+        r.transform_keys!(&:to_sym)
       end
       total = response['total']
-      { integrations: integrations, total: total }
+      { model.to_sym => results, total: total }
     end
   end
 end

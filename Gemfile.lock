@@ -65,6 +65,7 @@ GEM
       hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
+  aarch64-linux
   x86_64-linux
 
 DEPENDENCIES
@@ -77,4 +78,4 @@ DEPENDENCIES
   webmock (~> 3.12)
 
 BUNDLED WITH
-   2.2.15
+   2.2.33
