@@ -43,6 +43,22 @@ module FantasticstayApi
       process_response(response, 'reservations')
     end
 
+    def reservation(reservation_id, filters = {}, sort = {})
+      response = request(
+        http_method: :get,
+        endpoint: sprintf('reservations/%d', reservation_id)
+      )
+      process_single(response, 'reservation')
+    end
+
+    def guest(guest_id, filters = {}, sort = {})
+      response = request(
+        http_method: :get,
+        endpoint: sprintf('guests/%d', guest_id)
+      )
+      process_single(response, 'guest')
+    end
+
     def integrations
       response = request(
         http_method: :get,
@@ -53,13 +69,19 @@ module FantasticstayApi
 
     protected
 
-    def process_response(response, model='results')
+    def process_response(response, model = 'results')
       results = response[model]
       results.each do |r|
         r.transform_keys!(&:to_sym)
       end
-      total = response['total']
+      total = response.key?('total') ? response['total'] : 1
       { model.to_sym => results, total: total }
+    end
+
+    def process_single(response, model = 'result')
+      result = response[model]
+      result.transform_keys!(&:to_sym)
+      { model.to_sym => result }
     end
   end
 end
