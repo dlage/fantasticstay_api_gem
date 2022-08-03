@@ -70,6 +70,7 @@ module FantasticstayApi
       @client ||= Faraday.new(@api_endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
+        client.headers['Content-Type'] = 'application/json'
         client.headers['x-api-key'] = @api_token
         client.response :logger, logger
       end
