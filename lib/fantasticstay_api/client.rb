@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'logger'
 require_relative 'api'
 
@@ -28,7 +29,7 @@ module FantasticstayApi
           listing_id: listing_id,
           start_date: start_date,
           end_date: end_date,
-          filters: filters
+          filters: filters.to_json
         }.merge(global_params)
       )
       process_response(response, 'calendar')
@@ -41,7 +42,7 @@ module FantasticstayApi
         endpoint: 'reservations',
         params: {
           listing_id: listing_id,
-          filters: filters,
+          filters: filters.to_json,
           sort: sort
         }.merge!(global_params)
       )
