@@ -17,7 +17,7 @@ module FantasticstayApi
         endpoint: 'listings',
         params: global_params
       )
-      process_response(response, 'listings')
+      process_response(response)
     end
 
     # FantasticstayApi::Client.new.calendar(38859, '2022-01-01', '2022-07-31')
@@ -32,7 +32,7 @@ module FantasticstayApi
           filters: filters.to_json
         }.merge(global_params)
       )
-      process_response(response, 'calendar')
+      process_response(response)
     end
 
     # FantasticstayApi::Client.new.reservations(38859)
@@ -46,7 +46,7 @@ module FantasticstayApi
           sort: sort
         }.merge!(global_params)
       )
-      process_response(response, 'reservations')
+      process_response(response)
     end
 
     def reservation(reservation_id, global_params = {})
@@ -55,7 +55,7 @@ module FantasticstayApi
         endpoint: sprintf('reservations/%d', reservation_id),
         params: global_params
       )
-      process_response(response, 'reservation')
+      process_response(response)
     end
 
     def guest(guest_id, global_params = {})
@@ -64,7 +64,7 @@ module FantasticstayApi
         endpoint: sprintf('guests/%d', guest_id),
         params: global_params
       )
-      process_response(response, 'guest')
+      process_response(response)
     end
 
     def integrations(global_params = {})
@@ -73,27 +73,24 @@ module FantasticstayApi
         endpoint: 'integrations',
         params: global_params
       )
-      process_response(response, 'integrations')
+      process_response(response)
     end
 
     protected
 
-    def process_response(response, model = 'results')
-      result = {}
-      response.keys.each do |k|
-        result[k] = response[k]
-        case result[k]
-        when Hash
-          result[k].transform_keys!(&:to_sym)
-        when Array
-          result[k].each do |r|
-            r.transform_keys!(&:to_sym)
-          end
-        else
-          # Nothing to do with other structures, just leave as-is
+    def process_response(response)
+      result = response
+      case result
+      when Hash
+        result.transform_keys!(&:to_sym)
+        result.values.each do |r|
+          process_response(r)
+        end
+      when Array
+        result.each do |r|
+          process_response(r)
         end
       end
-      result.transform_keys!(&:to_sym)
       result
     end
   end
