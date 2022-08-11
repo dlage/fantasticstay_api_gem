@@ -36,7 +36,7 @@ module FantasticstayApi
     end
 
     # FantasticstayApi::Client.new.reservations(38859)
-    def reservations(listing_id, filters = [], sort = {}, global_params = {})
+    def reservations(listing_id, filters = [], sort = nil, global_params = {})
       response = request(
         http_method: :get,
         endpoint: 'reservations',
