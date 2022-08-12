@@ -35,6 +35,15 @@ module FantasticstayApi
       process_response(response)
     end
 
+    def listing(listing_id, global_params = {})
+      response = request(
+        http_method: :get,
+        endpoint: sprintf('listings/%d', listing_id),
+        params: global_params
+      )
+      process_response(response)
+    end
+
     # FantasticstayApi::Client.new.reservations(38859)
     def reservations(listing_id, filters = [], sort = nil, global_params = {})
       response = request(
