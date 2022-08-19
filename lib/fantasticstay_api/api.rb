@@ -5,6 +5,7 @@ require_relative 'configuration'
 require_relative 'constants'
 require_relative 'http_status_codes'
 require 'api_cache'
+require 'digest/bubblebabble'
 
 module FantasticstayApi
   # Core class responsible for api interface operations
@@ -78,7 +79,7 @@ module FantasticstayApi
     end
 
     def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
-      response = APICache.get(http_method.to_s + endpoint + params.to_s, cache: cache_ttl) do
+      response = APICache.get(Digest::SHA256.bubblebabble(@api_token) + http_method.to_s + endpoint + params.to_s, cache: cache_ttl) do
          client.public_send(http_method, endpoint, params)
       end
       parsed_response = Oj.load(response.body)

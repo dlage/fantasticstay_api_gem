@@ -38,7 +38,7 @@ module FantasticstayApi
     def listing(listing_id, global_params = {})
       response = request(
         http_method: :get,
-        endpoint: sprintf('listings/%d', listing_id),
+        endpoint: "listings/#{listing_id}",
         params: global_params
       )
       process_response(response)
@@ -53,7 +53,8 @@ module FantasticstayApi
           listing_id: listing_id,
           filters: filters.to_json,
           sort: sort
-        }.merge!(global_params)
+        }.merge!(global_params),
+        cache_ttl: 3600*24
       )
       process_response(response)
     end
@@ -61,7 +62,7 @@ module FantasticstayApi
     def reservation(reservation_id, global_params = {})
       response = request(
         http_method: :get,
-        endpoint: sprintf('reservations/%d', reservation_id),
+        endpoint: "reservations/#{reservation_id}",
         params: global_params
       )
       process_response(response)
@@ -70,8 +71,9 @@ module FantasticstayApi
     def guest(guest_id, global_params = {})
       response = request(
         http_method: :get,
-        endpoint: sprintf('guests/%d', guest_id),
-        params: global_params
+        endpoint: "guests/#{guest_id}",
+        params: global_params,
+        cache_ttl: 3600*24
       )
       process_response(response)
     end
