@@ -26,10 +26,7 @@ module FantasticstayApi
         http_method: :get,
         endpoint: 'calendar',
         params: {
-          listing_id: listing_id,
-          start_date: start_date,
-          end_date: end_date,
-          filters: filters.to_json
+          listing_id: listing_id, start_date: start_date, end_date: end_date, filters: filters.to_json
         }.merge(global_params)
       )
       process_response(response)
@@ -50,10 +47,7 @@ module FantasticstayApi
         http_method: :get,
         endpoint: 'reservations',
         params: {
-          listing_id: listing_id,
-          filters: filters.to_json,
-          sort: sort[:order],
-          direction: sort[:direction]
+          listing_id: listing_id, filters: filters.to_json, sort: sort[:order], direction: sort[:direction]
         }.merge!(global_params),
         cache_ttl: 3600 * 24
       )
@@ -95,13 +89,9 @@ module FantasticstayApi
       case result
       when Hash
         result.transform_keys!(&:to_sym)
-        result.values.each do |r|
-          process_response(r)
-        end
+        result.each_value { |r| process_response(r) }
       when Array
-        result.each do |r|
-          process_response(r)
-        end
+        result.each { |r| process_response(r) }
       end
       result
     end

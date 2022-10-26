@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'dotenv/load'
-require 'fantasticstay_api'
+# require 'dotenv/load' # Use when we want to record new responses
 require 'webmock/rspec'
+require 'fantasticstay_api'
 # require 'vcr_setup'
-# require 'webmock_setup'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -17,6 +16,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+APICache.store = nil
 
 def stub_get(path, endpoint = FantasticstayApi.endpoint.to_s)
   stub_request(:get, endpoint + path)

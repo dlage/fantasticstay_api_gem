@@ -14,7 +14,7 @@ module FantasticstayApi
     include Constants
     include HttpStatusCodes
 
-    attr_reader(*FantasticstayApi.configuration.property_names, :token, :endpoint)
+    attr_reader(*FantasticstayApi.configuration.property_names)
 
     attr_accessor :current_options
 
@@ -28,7 +28,6 @@ module FantasticstayApi
       end
     end
 
-    API_ENDPOINT = 'https://api.fsapp.io'
     HTTP_STATUS_MAPPING = {
       HTTP_BAD_REQUEST_CODE => BadRequestError,
       HTTP_UNAUTHORIZED_CODE => UnauthorizedError,
@@ -48,8 +47,6 @@ module FantasticstayApi
       FantasticstayApi.configuration.property_names.each do |key|
         send("#{key}=", opts[key])
       end
-      @api_token = opts[:token] || ENV['FANTASTICSTAY_API_TOKEN']
-      @api_endpoint = opts[:endpoint] || ENV['FANTASTICSTAY_API_ENDPOINT'] || API_ENDPOINT
 
       yield_or_eval(&block) if block_given?
     end
@@ -69,18 +66,21 @@ module FantasticstayApi
       # provide your own logger
       logger = Logger.new $stderr
       logger.level = Logger::DEBUG
-      @client ||= Faraday.new(@api_endpoint) do |client|
+      @client ||= Faraday.new(@endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
         client.headers['Content-Type'] = 'application/json'
-        client.headers['x-api-key'] = @api_token
+        client.headers['x-api-key'] = @token
         client.response :logger, logger
       end
     end
 
     def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
-      response = APICache.get(Digest::SHA256.bubblebabble(@api_token) + http_method.to_s + endpoint + params.to_s, cache: cache_ttl) do
-         client.public_send(http_method, endpoint, params)
+      response = APICache.get(
+        Digest::SHA256.bubblebabble(@token) + http_method.to_s + endpoint + params.to_s,
+        cache: cache_ttl
+      ) do
+        client.public_send(http_method, endpoint, params)
       end
       parsed_response = Oj.load(response.body)
 
@@ -108,7 +108,7 @@ module FantasticstayApi
       # :nodoc:
       case method_name.to_s
       when /^(.*)\?$/
-        !!send(Regexp.last_match(1).to_s)
+        !send(Regexp.last_match(1).to_s).nil?
       when /^clear_(.*)$/
         send("#{Regexp.last_match(1)}=", nil)
       else

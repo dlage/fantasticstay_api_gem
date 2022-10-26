@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'MIT'
   spec.required_ruby_version = Gem::Requirement.new('>= 2.4.0')
 
-  spec.metadata['allowed_push_host'] = "https://rubygems.org"
+  spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/dlage/fantasticstay_api_gem'
@@ -31,9 +31,9 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_dependency 'api_cache', '~> 0.3.0'
   spec.add_dependency 'faraday', '~> 1.3.0'
   spec.add_dependency 'oj', '~> 3.11'
-  spec.add_dependency 'api_cache', '~> 0.3.0'
 
   # spec.add_dependency 'dry-configurable', '~> 0.12.1'
 

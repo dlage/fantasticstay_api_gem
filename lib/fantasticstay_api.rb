@@ -4,8 +4,8 @@ require 'faraday'
 require 'oj'
 require_relative 'fantasticstay_api/version'
 
+# Base module for Fantasticstay API
 module FantasticstayApi
-  # Base module for Fantasticstay API
   class Error < StandardError; end
 
   LIBNAME = 'fantasticstay_api'
