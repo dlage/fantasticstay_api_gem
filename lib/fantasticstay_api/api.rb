@@ -71,6 +71,7 @@ module FantasticstayApi
         client.adapter Faraday.default_adapter
         client.headers['Content-Type'] = 'application/json'
         client.headers['x-api-key'] = @token
+        client.headers['User-Agent'] = @user_agent
         client.response :logger, logger
       end
     end
