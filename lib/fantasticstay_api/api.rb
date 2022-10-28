@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
+require 'dry-configurable'
 require_relative 'api_exceptions'
-require_relative 'configuration'
 require_relative 'constants'
 require_relative 'http_status_codes'
 require 'api_cache'
@@ -13,20 +13,7 @@ module FantasticstayApi
     include ApiExceptions
     include Constants
     include HttpStatusCodes
-
-    attr_reader(*FantasticstayApi.configuration.property_names)
-
-    attr_accessor :current_options
-
-    # Callback to update current configuration options
-    class_eval do
-      FantasticstayApi.configuration.property_names.each do |key|
-        define_method "#{key}=" do |arg|
-          instance_variable_set("@#{key}", arg)
-          current_options.merge!({ "#{key}": arg })
-        end
-      end
-    end
+    include Dry::Configurable
 
     HTTP_STATUS_MAPPING = {
       HTTP_BAD_REQUEST_CODE => BadRequestError,
@@ -36,16 +23,37 @@ module FantasticstayApi
       HTTP_UNPROCESSABLE_ENTITY_CODE => UnprocessableEntityError,
       'default' => ApiError
     }.freeze
+    API_ENDPOINT = 'https://api.fsapp.io'
+    API_TOKEN = 'TESTING'
+
+    setting :follow_redirects, default: true
+
+    # The api endpoint used to connect to FantasticstayApi if none is set
+    setting :endpoint, default: ENV['FANTASTICSTAY_API_ENDPOINT'] || API_ENDPOINT, reader: true
+
+    # The token included in request header 'x-api-key'
+    setting :token, default: ENV['FANTASTICSTAY_API_TOKEN'] || API_TOKEN, reader: true
+
+    # The value sent in the http header for 'User-Agent' if none is set
+    setting :user_agent, default: "FantasticstayApi API Ruby Gem #{FantasticstayApi::VERSION}"
+
+    # By default uses the Faraday connection options if none is set
+    setting :connection_options, default: {}
+
+    # By default display 30 resources
+    setting :per_page, default: 10
+
+    # Add Faraday::RackBuilder to overwrite middleware
+    setting :stack
 
     # Create new API
     #
     # @api public
     def initialize(options = {}, &block)
-      opts = FantasticstayApi.configuration.fetch.merge(options)
-      @current_options = opts
-
-      FantasticstayApi.configuration.property_names.each do |key|
-        send("#{key}=", opts[key])
+      configure do |c|
+        options.each_key do |key|
+          c.send("#{key}=", options[key])
+        end
       end
 
       yield_or_eval(&block) if block_given?
@@ -63,29 +71,28 @@ module FantasticstayApi
     private
 
     def client
-      # provide your own logger
-      logger = Logger.new $stderr
-      logger.level = Logger::DEBUG
-      @client ||= Faraday.new(@endpoint) do |client|
+      @client ||= Faraday.new(config.endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
         client.headers['Content-Type'] = 'application/json'
-        client.headers['x-api-key'] = @token
-        client.headers['User-Agent'] = @user_agent
-        client.response :logger, logger
+        client.headers['x-api-key'] = config.token
+        client.headers['User-Agent'] = config.user_agent
       end
     end
 
     def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
       response = APICache.get(
-        Digest::SHA256.bubblebabble(@token) + http_method.to_s + endpoint + params.to_s,
+        Digest::SHA256.bubblebabble(config.token) + http_method.to_s + endpoint + params.to_s,
         cache: cache_ttl
       ) do
         client.public_send(http_method, endpoint, params)
       end
-      parsed_response = Oj.load(response.body)
 
-      return parsed_response if response_successful?(response)
+      process_http_response(response)
+    end
+
+    def process_http_response(response)
+      return Oj.load(response.body) if response_successful?(response)
 
       raise error_class(response), "Code: #{response.status}, response: #{response.body}"
     end
