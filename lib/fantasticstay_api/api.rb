@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'dry-configurable'
 require_relative 'api_exceptions'
 require_relative 'constants'
 require_relative 'http_status_codes'
+require 'dry-configurable'
 require 'api_cache'
 require 'digest/bubblebabble'
 
@@ -107,25 +107,6 @@ module FantasticstayApi
 
     def response_successful?(response)
       response.status == HTTP_OK_CODE
-    end
-
-    # Responds to attribute query or attribute clear
-    #
-    # @api private
-    def method_missing(method_name, *args, &block)
-      # :nodoc:
-      case method_name.to_s
-      when /^(.*)\?$/
-        !send(Regexp.last_match(1).to_s).nil?
-      when /^clear_(.*)$/
-        send("#{Regexp.last_match(1)}=", nil)
-      else
-        super
-      end
-    end
-
-    def respond_to_missing?(method_name, include_private = false)
-      method_name.to_s.start_with?('clear_') || super
     end
   end
 end

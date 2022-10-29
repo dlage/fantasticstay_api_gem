@@ -82,6 +82,17 @@ module FantasticstayApi
       process_response(response)
     end
 
+    # FantasticstayApi::Client.new.search(query)
+    def search(query, type = nil, global_params = {})
+      response = request(
+        http_method: :get,
+        endpoint: 'search',
+        params: { q: query, type: type }.merge!(global_params),
+        cache_ttl: 3600 * 24
+      )
+      process_response(response)
+    end
+
     protected
 
     def process_response(response)
