@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fantasticstay_api (0.1.6)
+    fantasticstay_api (0.1.7)
       api_cache (~> 0.3.0)
       dry-configurable (~> 0.13)
       faraday (~> 2.6.0)

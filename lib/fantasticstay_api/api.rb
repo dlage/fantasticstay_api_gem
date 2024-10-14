@@ -82,13 +82,15 @@ module FantasticstayApi
         client.headers['x-api-key'] = config.token
         client.headers['User-Agent'] = config.user_agent
         client.options.timeout = config.timeout
+        client.response :raise_error # raise Faraday::Error on status code 4xx or 5xx
       end
     end
 
     def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
       response = APICache.get(
         Digest::SHA256.bubblebabble(config.token) + http_method.to_s + endpoint + params.to_s,
-        cache: cache_ttl
+        cache: cache_ttl,
+        timeout: config.timeout
       ) do
         client.public_send(http_method, endpoint, params)
       end
