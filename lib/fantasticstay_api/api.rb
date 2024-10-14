@@ -24,12 +24,16 @@ module FantasticstayApi
       'default' => ApiError
     }.freeze
     API_ENDPOINT = 'https://api.fsapp.io'
+    API_TIMEOUT = 30
     API_TOKEN = 'TESTING'
 
     setting :follow_redirects, default: true
 
     # The api endpoint used to connect to FantasticstayApi if none is set
     setting :endpoint, default: ENV['FANTASTICSTAY_API_ENDPOINT'] || API_ENDPOINT, reader: true
+
+    # The timeout in requests made to fsapp
+    setting :timeout, default: ENV['FANTASTICSTAY_API_TIMEOUT'] || API_TIMEOUT, reader: true
 
     # The token included in request header 'x-api-key'
     setting :token, default: ENV['FANTASTICSTAY_API_TOKEN'] || API_TOKEN, reader: true
@@ -71,12 +75,16 @@ module FantasticstayApi
     private
 
     def client
+      logger = Logger.new $stderr
+      logger.level = Logger::DEBUG
       @client ||= Faraday.new(config.endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
         client.headers['Content-Type'] = 'application/json'
         client.headers['x-api-key'] = config.token
         client.headers['User-Agent'] = config.user_agent
+        client.options.timeout = config.timeout
+        client.response :logger, logger
       end
     end
 
