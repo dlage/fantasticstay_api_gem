@@ -75,8 +75,6 @@ module FantasticstayApi
     private
 
     def client
-      logger = Logger.new $stderr
-      logger.level = Logger::DEBUG
       @client ||= Faraday.new(config.endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
@@ -84,7 +82,6 @@ module FantasticstayApi
         client.headers['x-api-key'] = config.token
         client.headers['User-Agent'] = config.user_agent
         client.options.timeout = config.timeout
-        client.response :logger, logger
       end
     end
 
