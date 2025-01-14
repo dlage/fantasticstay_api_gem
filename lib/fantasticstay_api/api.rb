@@ -82,13 +82,17 @@ module FantasticstayApi
       @client ||= Faraday.new(config.endpoint) do |client|
         client.request :url_encoded
         client.adapter Faraday.default_adapter
-        client.headers['Content-Type'] = 'application/json'
-        client.headers['x-api-key'] = config.token
-        client.headers['User-Agent'] = config.user_agent
         client.options.timeout = config.timeout
+        init_client_headers(client)
         client.response :raise_error # raise Faraday::Error on status code 4xx or 5xx
-        client.response :logger, ::Logger.new(STDOUT), body: true, bodies: { request: true, response: true }
+        client.response :logger, ::Logger.new($stdout), body: true, bodies: { request: true, response: true }
       end
+    end
+
+    def init_client_headers(client)
+      client.headers['Content-Type'] = 'application/json'
+      client.headers['x-api-key'] = config.token
+      client.headers['User-Agent'] = config.user_agent
     end
 
     def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
