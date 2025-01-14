@@ -24,7 +24,8 @@ module FantasticstayApi
       'default' => ApiError
     }.freeze
     API_ENDPOINT = 'https://api.fsapp.io'
-    API_TIMEOUT = 30
+    API_TIMEOUT = 5 # API response timeout
+    API_STALE_VALIDITY = :forever # 604800 = 7 days - Maximum time to use old data
     API_TOKEN = 'TESTING'
 
     setting :follow_redirects, default: true
@@ -34,6 +35,9 @@ module FantasticstayApi
 
     # The timeout in requests made to fsapp
     setting :timeout, default: ENV['FANTASTICSTAY_API_TIMEOUT'] || API_TIMEOUT, reader: true
+
+    # The stale validity in requests that fail to fsapp
+    setting :stale_validity, default: ENV['FANTASTICSTAY_API_STALE_VALIDITY'] || API_STALE_VALIDITY, reader: true
 
     # The token included in request header 'x-api-key'
     setting :token, default: ENV['FANTASTICSTAY_API_TOKEN'] || API_TOKEN, reader: true
@@ -83,6 +87,7 @@ module FantasticstayApi
         client.headers['User-Agent'] = config.user_agent
         client.options.timeout = config.timeout
         client.response :raise_error # raise Faraday::Error on status code 4xx or 5xx
+        client.response :logger, ::Logger.new(STDOUT), body: true, bodies: { request: true, response: true }
       end
     end
 
@@ -90,6 +95,7 @@ module FantasticstayApi
       response = APICache.get(
         Digest::SHA256.bubblebabble(config.token) + http_method.to_s + endpoint + params.to_s,
         cache: cache_ttl,
+        valid: config.stale_validity,
         timeout: config.timeout
       ) do
         client.public_send(http_method, endpoint, params)
