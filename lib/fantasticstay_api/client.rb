@@ -63,6 +63,36 @@ module FantasticstayApi
       process_response(response)
     end
 
+    def custom_fields(global_params = {})
+      response = request(
+        http_method: :get,
+        endpoint: "custom_fields",
+        params: global_params
+      )
+      process_response(response)
+    end
+
+    def set_custom_field_value(id, value, listing_ids: [], reservation_ids: [], global_params: {})
+      response = request(
+        http_method: :post,
+        endpoint: "custom_fields/set_values",
+        params: {
+          custom_field_id: id,
+          #value: value,
+          #listing_ids: listing_ids.to_json,
+          #reservation_ids: reservation_ids.to_json
+        }.merge!(global_params),
+        body: {
+          value: value,
+          listing_ids: listing_ids,
+          reservation_ids: reservation_ids
+          # listing_ids: "{\"listing_ids\":[#{listing_ids.join(',')}]}",
+          # reservation_ids: "{\"reservation_ids\":[#{reservation_ids.join(',')}]}"
+        },
+      )
+      process_response(response)
+    end
+
     def guest(guest_id, global_params = {})
       response = request(
         http_method: :get,

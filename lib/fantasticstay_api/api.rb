@@ -95,14 +95,17 @@ module FantasticstayApi
       client.headers['User-Agent'] = config.user_agent
     end
 
-    def request(http_method:, endpoint:, params: {}, cache_ttl: 3600)
+    def request(http_method:, endpoint:, params: {}, body: {}, cache_ttl: 3600)
       response = APICache.get(
-        Digest::SHA256.bubblebabble(config.token) + http_method.to_s + endpoint + params.to_s,
+        Digest::SHA256.bubblebabble(config.token) + http_method.to_s + endpoint + params.to_s + body.to_s,
         cache: cache_ttl,
         valid: config.stale_validity,
         timeout: config.timeout
       ) do
-        client.public_send(http_method, endpoint, params)
+        client.public_send(http_method, endpoint) do |req|
+          req.params = params
+          req.body = body.to_json if body.size
+        end
       end
 
       process_http_response(response)
