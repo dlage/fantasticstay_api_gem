@@ -42,14 +42,14 @@ module FantasticstayApi
     end
 
     # FantasticstayApi::Client.new.reservations(38859)
-    def reservations(listing_id, filters = [], sort = { order: 'checkIn', direction: 'desc' }, global_params = {})
+    def reservations(listing_id, filters = [], sort = { order: 'checkIn', direction: 'desc' }, global_params = {}, cache_ttl = 3600 * 24)
       response = request(
         http_method: :get,
         endpoint: 'reservations',
         params: {
           listing_id: listing_id, filters: filters.to_json, sort: sort[:order], direction: sort[:direction]
         }.merge!(global_params),
-        cache_ttl: 3600 * 24
+        cache_ttl: cache_ttl
       )
       process_response(response)
     end
